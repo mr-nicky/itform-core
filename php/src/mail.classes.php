@@ -13,7 +13,7 @@ class MailFactory
      */
     private $authSettings;
 
-    function __construct($useMail, $authSettings = null)
+    function __construct($authSettings)
     {
         $this->authSettings = $authSettings;
     }

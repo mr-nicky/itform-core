@@ -1,6 +1,8 @@
 require('jquery-ui');
 require('jquery-mask-plugin');
 
+var $ = require('jquery');
+
 exports.itOrderName = function(c, $el) {
   var nameRegex = /^[a-zA-Zа-яА-ЯёЁ'][a-zA-Z-а-яА-ЯёЁ' ]+[a-zA-Zа-яА-ЯёЁ']?$/;
 
@@ -72,6 +74,49 @@ exports.itOrderAddress = function(c, $el) {
   });
 };
 
+function extractMailData(c, type) {
+  var data = {
+    'car_mark': c.get('show.car_mark'),
+    'car_model': c.get('show.car_model'),
+    'car_manufacturing_year': c.get('calculation.car_manufacturing_year'),
+    'car_cost': c.get('calculation.car_cost'),
+    'contributory_scheme': c.get('show.contributory_scheme'),
+    'calculationId':c.get('calculation.id'),
+    'resultId':c.get('show.extraParameters.resultId'),
+    'name': c.get('order.name'),
+    'phone': c.get('order.phone'),
+    'address': c.get('order.address'),
+    'type': type,
+    'delivery': c.get('order.delivery')
+  };
+
+  data.credit_bank = c.get('show.credit_bank') ? c.get('show.credit_bank') : 'Нет';
+  var calc = c.get('calc');
+
+  if (calc.is_multidrive) {
+    data.drivers = 'Мультидрайв: ' + calc.drivers_minimal_age + ' мин. возраст, ' + calc.drivers_minimal_experience + ' мин. стаж';
+  } else {
+    data.drivers = '';
+    for (var i = 0; i < calc.driver_set.length; i++) {
+      data.drivers += ' ' + calc.driver_set[i].age + '/' + calc.driver_set[i].expirience + ' ' +
+        (calc.driver_set[i].gender === 'M' ? 'м' : 'ж') + ', '; // api typo don't touch
+    }
+  }
+
+  return data;
+}
+
+function sendMailData(c, type) {
+  var data = extractMailData(c, type);
+
+  $.ajax({
+    url: c.getForm().HTTP_MAIL_URL,
+    dataType: 'json',
+    data: JSON.stringify(data),
+    method: 'POST'
+  });
+}
+
 exports.itOrderForm = function(c, $el, control) {
   control.traverseChildren(c.elNode, c.elNode.$el);
   var validation = c.getValidatorEngine();
@@ -80,6 +125,7 @@ exports.itOrderForm = function(c, $el, control) {
     e.preventDefault();
     var isValid = validation.runCheck(true);
     if (isValid) {
+      sendMailData(c, 'report');
       $el.find('input,button').prop('disabled', true);
       $el.append('<h3>Благодарим за обращение, в ближайшее время с вами свяжется персональный менеджер</h3>');
     } else {
@@ -92,7 +138,7 @@ exports.itOrderDelivery = function(c, $el) {
   var validation = c.getValidatorEngine();
   var notify = validation.addValidator({
     validate: function() {
-      return c.get('order.delivery').length > 0;
+      return Boolean(c.get('order.delivery')) && c.get('order.delivery').length > 0;
     },
     success: function() {
       $el.removeClass('it-input-invalid');

@@ -22,11 +22,11 @@ class FnCalledAuthSettings implements AuthSettings
     }
 }
 
-$smtpSettings = new FnCalledAuthSettings();
+$authSettings = new FnCalledAuthSettings();
 
 if (ITFORM_DEBUG && $_REQUEST['testmail']) {
     $useMail = $_REQUEST['method'] === 'mail';
-    $mailFactory = new MailFactory($useMail, $smtpSettings);
+    $mailFactory = new MailFactory($authSettings);
     $mail = $mailFactory->createMail();
     $mail->addAddress($_REQUEST['testmail']);
     $mail->Body = 'Hello from itform email';
@@ -44,7 +44,7 @@ if (ITFORM_DEBUG && $_REQUEST['testmail']) {
     exit(0);
 }
 
-$mailFactory = new MailFactory($smtpSettings);
+$mailFactory = new MailFactory($authSettings);
 $json = json_decode(file_get_contents('php://input'));
 ItSetUpMailData($json);
 
@@ -53,5 +53,11 @@ ItSetUpMail($mail);
 ItSetUpBody($json, $mail);
 if ($mail->send()) {
     echo 'sent';
+} else {
+    echo 'error';
+    if (ITFORM_DEBUG) {
+        echo "<pre>";
+        var_dump($mail);
+        echo "</pre>";
+    }
 }
-echo 'error';
