@@ -34,6 +34,7 @@ exports.itCarCost = function(c, $el) {
   c.appendToStep();
 
   var sliderPresent = false;
+  var blockAutoChange = false;
 
   var $input = $el.find('input');
   var $slider = $el.find('.slider');
@@ -56,14 +57,18 @@ exports.itCarCost = function(c, $el) {
   });
 
   $input.on('change', function() {
+    blockAutoChange = true;
     if ($slider) {
       $slider.slider('value', $input.val());
     }
-    c.set('calc.car_cost', $input.val());
+    c.set('calc.car_cost', $input.val().replace(/\s+/g, ''));
     notify();
   });
 
   c.listen('calc.car_model', function() {
+    if (blockAutoChange) {
+      return;
+    }
     var dict = c.loadDictionary('/rest/default/car_mark/' + c.get('calc.car_mark') + '/car_model/' +
       c.get('calc.car_model') + '/?fields=prices&year=' + c.get('calc.car_manufacturing_year'));
 
@@ -85,6 +90,7 @@ exports.itCarCost = function(c, $el) {
           max: mm.max,
           step: 1000,
           slide: function(event, ui) {
+            blockAutoChange = true;
             $input.val(c.formatNumber(ui.value));
             c.set('calc.car_cost', ui.value.toString());
           }

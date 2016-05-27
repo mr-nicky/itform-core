@@ -18,6 +18,7 @@ exports.itStepNav = function(c, $el) {
     });
   }
 
+  //should be in some kind of extension
   var ieHeightFix = /Trident\/|MSIE /.test(window.navigator.userAgent);
 
   if (ieHeightFix) {
@@ -55,6 +56,21 @@ exports.itStepNav = function(c, $el) {
       $forStep.removeClass(ACTIVE_CLASS);
     }
   }
+
+  c.listen('internal.calcChanged', function(changed) {
+    if(!changed) return;
+    
+    var changeNow = false;
+    for (var i = 0; i < $forSteps.length; i++) {
+      var $forStep = $($forSteps[i]);
+      if (changeNow || $forStep.attr('it-for-step') === 'program_selection') {
+        changeNow = true;
+      } else {
+        continue;
+      }
+      $forStep.find('button').prop('disabled', true);
+    }
+  });
 
   c.beforeStep(function(step) {
     currentName = step.name;

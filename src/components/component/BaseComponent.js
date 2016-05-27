@@ -19,6 +19,7 @@ function BaseComponent(model, elNode, camelAttr) {
     require('./dataOperations'),
     require('./elementOperations'),
     require('./structureOperations'),
+    require('./dateExtractionOperations'),
     require('./formatOperations')
   );
 

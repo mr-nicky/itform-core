@@ -11,6 +11,7 @@ function listenForChange(c) {
   c.listen('calc.driver_set', changed());
   c.listen('calc.drivers_count', changed());
   c.listen('calc.is_multidrive', changed());
+  c.listen('calc.antitheft', changed());
   c.listen('calc.is_under_warranty', changed());
   c.listen('calc.drivers_minimal_age', changed());
   c.listen('calc.drivers_minimal_experience', changed());
@@ -34,8 +35,8 @@ exports.itCalculation = function(c) {
     if (!changed) {
       return;
     }
-    c.set('calc.exploitation_area', 30291);  // Saint Petersburg as default area.
-    req = new XMLHttpRequest();
+    c.set('calc.exploitation_area', c.getForm().DEFAULT_REGION);  // Saint Petersburg as default area.
+    req = c.getXhrFactory().create();
     req.onreadystatechange = function() {
       if (req.readyState === 4) {
         if (req.status >= 200 && req.status < 300) {
@@ -45,8 +46,7 @@ exports.itCalculation = function(c) {
         done();
       }
     };
-    req.open('POST', 'http://homepolis.ru/it-form/proxy.php');
-    req.setRequestHeader('X-Itform-Forward', '/rest/full/calculation/?token');
+    req.open('POST', '/rest/full/calculation/?token');
     req.send(JSON.stringify(c.get('calc')));
   });
 

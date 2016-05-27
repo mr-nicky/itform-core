@@ -58,7 +58,7 @@ exports.itOrderAddress = function(c, $el) {
   var validation = c.getValidatorEngine();
   var notify = validation.addValidator({
     validate: function() {
-      return $el.val().length > 4;
+      return $el.val().length > 4 || $el.prop('disabled');
     },
     success: function() {
       $el.removeClass('it-input-invalid');
@@ -71,6 +71,89 @@ exports.itOrderAddress = function(c, $el) {
   $el.keypress(function() {
     notify();
     c.set('order.address', $el.val());
+  });
+
+  $el.on('force:enable', function() {
+    $el.prop('disabled', false);
+    c.set('order.address', $el.val());
+    notify();
+  });
+
+  $el.on('force:disable', function() {
+    $el.prop('disabled', true);
+    c.set('order.address', '');
+    notify();
+  });
+};
+
+exports.itOrderDate = function(c, $el) {
+  var validation = c.getValidatorEngine();
+  var notify = validation.addValidator({
+    validate: function() {
+      return $el.val().length > 4 || $el.prop('disabled');
+    },
+    success: function() {
+      $el.removeClass('it-input-invalid');
+    },
+    failure: function() {
+      $el.addClass('it-input-invalid');
+    }
+  });
+  notify();
+
+  function updateDate() {
+    notify();
+    c.set('order.address', $el.val());
+  }
+
+  $el.datepicker({
+    onSelect: updateDate
+  });
+  $el.change(updateDate);
+
+
+  $el.on('force:enable', function() {
+    $el.prop('disabled', false);
+    updateDate();
+  });
+
+  $el.on('force:disable', function() {
+    $el.prop('disabled', true);
+  });
+};
+
+exports.itOrderTime = function(c, $el) {
+  var re = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+
+  var validation = c.getValidatorEngine();
+  var notify = validation.addValidator({
+    validate: function() {
+      return re.test($el.val()) || $el.prop('disabled');
+    },
+    success: function() {
+      $el.removeClass('it-input-invalid');
+    },
+    failure: function() {
+      $el.addClass('it-input-invalid');
+    }
+  });
+  notify();
+
+  function updateDate() {
+    notify();
+    c.set('order.address', $el.val());
+  }
+
+  $el.mask('99:99');
+  $el.keypress(updateDate);
+  $el.on('force:enable', function() {
+    $el.prop('disabled', false);
+    updateDate();
+  });
+
+  $el.on('force:disable', function() {
+    $el.prop('disabled', true);
+    notify();
   });
 };
 
@@ -86,12 +169,6 @@ function sendMailData(c, type) {
 }
 
 exports.itOrderForm = function(c, $el, control) {
-  c.resolve(function() {
-    $('html,body').animate({
-      scrollTop: $el.offset().top
-    });
-  });
-
   control.traverseChildren(c.elNode, c.elNode.$el);
   var validation = c.getValidatorEngine();
 
@@ -125,6 +202,13 @@ exports.itOrderDelivery = function(c, $el) {
   c.sync('change', function(checked) {
     notify();
     if (checked) {
+      if ($el.val() === 'address') {
+        $('#to_office').find('input').trigger('force:disable');
+        $('#to_address').find('input').trigger('force:enable');
+      } else {
+        $('#to_office').find('input').trigger('force:enable');
+        $('#to_address').find('input').trigger('force:disable');
+      }
       c.set('order.delivery', $el.val());
     }
   });
@@ -166,12 +250,4 @@ exports.itOrderSubmit = function(c, $el) {
       e.preventDefault();
     }
   });
-};
-
-exports.itOrderEmail = function(c, $el) {
-  function update(e) {
-    c.set('order.email', $el.val());
-  }
-
-  c.sync('change', update);
 };

@@ -23,6 +23,9 @@ function placeLoadedData(c, $element, program) {
     itPrice: function(price, $el) {
       $el.text(price.formatNumber(sum));
     },
+    itProgramTitle: function(name, $el) {
+      $el.text(program.program.title);
+    },
     itDiscount: function(price, $el) {
       $el.text(price.formatNumber(Math.floor(sum * 0.05)));
     },
@@ -64,6 +67,86 @@ function placeLoadedData(c, $element, program) {
   });
 }
 
+function extractMessages(messages) {
+  return function(c, $el) {
+    $el.empty();
+    if (!messages) {
+      return;
+    }
+    messages.forEach(function(message) {
+      var $new = $('<div></div>').text(message);
+      $el.append($new);
+    });
+  };
+}
+
+function showOnHover() {
+  var $prev;
+  return function(c, $el, program) {
+    //hover hook
+    $el.off('.showOnHover');
+    $el.on('mouseover.showOnHover', function() {
+      if ($prev) {
+        $prev.removeClass('it-hovered');
+      }
+      $prev = $el;
+      $el.addClass('it-hovered');
+      c.set('external.hoveredProgram', program);
+    });
+  }
+}
+
+exports.itSelectedProgram = function(c, $el) {
+  c.resolve(function() {
+    c.set('external.hoveredProgram', {
+      messages: {
+        error: null,
+        warnings: null,
+        messages: null,
+        print_msg: null
+      }
+    })
+  });
+
+  c.listen('external.hoveredProgram', function(program) {
+    c.childComponents({
+      itErrors: extractMessages(program.messages.errors),
+      itWarnings: extractMessages(program.messages.warnings),
+      itMessages: extractMessages(program.messages.messages),
+      itPrintMsg: extractMessages(program.messages.print_msg),
+      itOptions: function(c, $el) {
+        $el.empty();
+        if (!program.program) {
+          return;
+        }
+
+        var $template = $('<div>' +
+          '<div it-title></div>' +
+          '<div it-note></div>' +
+          '</div>');
+
+        var actives = program.program.option_set.reduce(function(arr, option) {
+          if (option.is_active) {
+            return arr.concat(option);
+          }
+          return arr;
+        }, []);
+
+        actives.forEach(function(active) {
+          var $content = $template.clone();
+          var children = findChildren($content, {
+            itTitle: null,
+            itNote: null
+          });
+          children.itTitle.$el.text(active.title);
+          children.itNote.$el.text(active.note);
+          $el.append($content);
+        });
+      }
+    });
+  });
+};
+
 exports.itAnswerPlace = function(c) {
   c.appendToStep();
 
@@ -84,8 +167,12 @@ exports.itAnswerPlace = function(c) {
     cmp.elNode.$el.css('visibility', 'hidden');
   });
 
+  var $img;
   c.listen('internal.programStorage', function(storage) {
-    var $img = $('<img>').insertBefore(c.elNode.$el);
+    if ($img) {
+      $img.remove();
+    }
+    $img = $('<img>').insertBefore(c.elNode.$el);
     $img.attr('src', 'images/loading.gif');
 
     $img.css({
@@ -105,9 +192,11 @@ exports.itAnswerPlace = function(c) {
       places.forEach(function(cmp) {
         cmp.elNode.$el.css('visibility', 'hidden');
       });
+      var hover = showOnHover();
       programs.forEach(function(program, index) {
         places[index].elNode.$el.css('visibility', '');
         placeLoadedData(c, places[index].elNode.$el, program);
+        hover(c, places[index].elNode.$el, program);
       });
     });
     c.set('internal.programTemplateStartAt', length);

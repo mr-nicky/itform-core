@@ -55,9 +55,10 @@ if ($mail->send()) {
     echo 'sent';
 } else {
     echo 'error';
+}
+
     if (ITFORM_DEBUG) {
         echo "<pre>";
         var_dump($mail);
         echo "</pre>";
     }
-}
