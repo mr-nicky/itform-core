@@ -24,3 +24,21 @@ exports.baseRegistry = function() {
   registry.register(require('./src/components/core/itStepNav'));
   return registry;
 };
+
+
+/* forces reload/refresh when pressing the back button */
+(function (window,document) {
+    console.log(document);
+    window.onunload = function(){};
+    if (window.history.state != null && window.history.state.hasOwnProperty('historic')) {
+        if (window.history.state.historic == true) {
+            window.history.replaceState({historic: false}, '');
+            window.location.reload();
+        } else {
+            window.history.replaceState({historic  : true}, '');
+        }
+    } else {
+        window.history.replaceState({historic  : true}, '');
+    }
+
+})(global, global.document);
