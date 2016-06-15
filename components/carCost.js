@@ -22,10 +22,15 @@ function findMinMax(model) {
     r.current = median(model.prices);
   } else {
     r.show = false;
+    r.current = null;
   }
   r.min -= r.min % 1000;
   r.max -= r.max % 1000;
-  r.current -= r.current % 1000;
+
+  if (r.current) {
+    r.current -= r.current % 1000;
+  }
+
   return r;
 }
 
@@ -58,9 +63,11 @@ exports.itCarCost = function(c, $el) {
 
   $input.on('change', function() {
     blockAutoChange = true;
-    if ($slider) {
+    if ($slider.is(':visible')) {
       $slider.slider('value', $input.val());
     }
+
+    console.log($input.val().replace(/\s+/g, ''), $input.val());
     c.set('calc.car_cost', $input.val().replace(/\s+/g, ''));
     notify();
   });
@@ -77,6 +84,7 @@ exports.itCarCost = function(c, $el) {
       c.set('calc.car_cost', mm.current);
       $input.val(mm.current);
       sliderPresent = mm.show;
+
       if (sliderPresent) {
         $sliderWrapper.show();
 
