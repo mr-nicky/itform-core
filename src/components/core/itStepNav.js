@@ -34,7 +34,15 @@ exports.itStepNav = function(c, $el) {
 
     nameSet.add(name);
     $button.prop('disabled', true);
+    
+    $a.addClass('c-link-disabled');
 
+    $a.on('click.Itf', function(event) {
+      event.stopImmediatePropagation();
+
+      return false;
+    });
+    
     function moveTo(e) {
       e.preventDefault();
 
@@ -42,12 +50,9 @@ exports.itStepNav = function(c, $el) {
         c.getForm().moveToName(name);
       }
     }
-
     $button.click(moveTo);
-    $a.click(function(e) {
-      e.preventDefault();
-      //implement it
-    });
+    $a.on('click', moveTo);
+
   });
 
   function resetSteps() {
@@ -82,7 +87,13 @@ exports.itStepNav = function(c, $el) {
     var $active = $el.find('[it-for-step=\'' + step.name + '\']');
     $active.addClass(ACTIVE_CLASS);
     var $button = $active.find('button');
+    var $a = $active.find('a');
+    
     $button.prop('disabled', false);
+
+    $a.off('click.Itf');
+    $a.removeClass('c-link-disabled');
+
   });
 
   resetSteps();

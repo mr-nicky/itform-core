@@ -1,9 +1,12 @@
 var _ = require('lodash/core');
 
 function StepCleanups(form) {
+  
   var self = form._core = {};
+  
   self.afterInitCbs = [];
 
+  
   form.afterInit = function(cb) {
     self.afterInitCbs.push(cb);
   };

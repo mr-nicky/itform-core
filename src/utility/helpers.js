@@ -1,4 +1,5 @@
 function findDeepObject(pathChunks, obj) {
+  
   pathChunks = pathChunks.concat();
   while (pathChunks.length) {
     var chunk = pathChunks.shift();
