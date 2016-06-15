@@ -150,7 +150,7 @@ exports.itCarManufacturingYear = function(c, $el) {
   var $tbody = $el.find('tbody');
   $tbody.empty();
 
-  var startYear = 1991;
+  var startYear = 2006;
   var endYear = new Date().getFullYear();
   var data = [];
 
