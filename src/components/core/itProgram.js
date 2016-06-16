@@ -213,21 +213,26 @@ exports.itProgram = function(c) {
 };
 
 exports.itProgramProgress = function(c, $el) {
+
   var $children = $el.children();
   var minWidth = 25;
-  $children.css('width', minWidth + '%');
-  $children.text(
-    'Обработано запросов: ' + 0 +
-    ' из ' + 0);
 
   c.listen('external.progress', function(progress) {
     var length = progress.loaded / progress.max * 100;
+
     if (length < minWidth) {
       length = minWidth;
     }
+
     $children.css('width', length + '%');
     $children.text(
-      'Обработано запросов: ' + progress.loaded +
-      ' из ' + progress.max);
+      length + '%'
+    );
+
+    if (length >= 100) {
+      $el.hide();
+    } else {
+      $el.show();
+    }
   });
 };
