@@ -217,6 +217,12 @@ exports.itProgramProgress = function(c, $el) {
   var $children = $el.children();
   var minWidth = 25;
 
+  var $calculationIdElement = document.querySelector('.it-calculation');
+  var $programMessagesElement = document.querySelector('.it-program-messages');
+
+  $calculationIdElement.style.display = 'none';
+  $programMessagesElement.style.display = 'none';
+
   c.listen('external.progress', function(progress) {
     var length = progress.loaded / progress.max * 100;
 
@@ -230,6 +236,8 @@ exports.itProgramProgress = function(c, $el) {
     );
 
     if (length >= 100) {
+      $calculationIdElement.style.display = 'table';
+      $programMessagesElement.style.display = 'block';
       $el.hide();
     } else {
       $el.show();
