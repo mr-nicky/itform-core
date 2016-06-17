@@ -90,16 +90,42 @@ exports.itDriverMulti = function(c, $el) {
 };
 
 function checkAgeAndExp(age, experience) {
-  var valid = true;
-  if (isNaN(age) || isNaN(experience)) {
-    valid = false;
+  var valid = {
+    age: true,
+    exp: true
+  };
+
+  if (age >= 18 && experience != 0 && !experience) {
+    valid.exp = false;
+
+    return valid;
   }
+
+  if (isNaN(age)) {
+    valid.age = false;
+  }
+
+  if (isNaN(experience)) {
+    valid.exp = false;
+  }
+
   if (age - experience < 18) {
-    valid = false;
+    valid.exp = false;
   }
-  if (age > 90 || age < 18) valid = false;
-  if (experience > 72) valid = false;
+
+  if (age > 90 || age < 18) {
+    valid.age = false;
+  }
+
+  if (experience > 72) {
+    valid.exp = false;
+  }
+
   return valid;
+}
+
+function setValidityEl(el, isValid) {
+  el[isValid ? 'removeClass' : 'addClass']('it-input-invalid');
 }
 
 exports.itDriverCount = function(c, $el) {
@@ -118,16 +144,13 @@ exports.itDriverCount = function(c, $el) {
           var cmp = currentComponents[i];
           var age = parseInt(cmp.itDriverAge.elNode.$el.val(), 10);
           var experience = parseInt(cmp.itDriverExperience.elNode.$el.val(), 10);
+
           valid = checkAgeAndExp(age, experience);
 
-          if (valid) {
-            cmp.itDriverAge.elNode.$el.removeClass('it-input-invalid');
-            cmp.itDriverExperience.elNode.$el.removeClass('it-input-invalid');
-          } else {
-            cmp.itDriverAge.elNode.$el.addClass('it-input-invalid');
-            cmp.itDriverExperience.elNode.$el.addClass('it-input-invalid');
-          }
-          overAllValid = valid && overAllValid;
+          setValidityEl(cmp.itDriverAge.elNode.$el, valid.age);
+          setValidityEl(cmp.itDriverExperience.elNode.$el, valid.exp);
+
+          overAllValid = valid.age && valid.exp && overAllValid;
         }
         return overAllValid;
       },
