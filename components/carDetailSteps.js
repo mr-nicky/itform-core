@@ -163,8 +163,12 @@ exports.itCarManufacturingYear = function(c, $el) {
 
   var cells = toCells(data, 0, function(entry) {
     return function(e) {
+      var currYear = new Date().getFullYear();
+
       e.preventDefault();
 
+      // "Если машина младше трех лет, то по дилеру, а если старше - то по страховщику"
+      c.set('calc.payment_form', [ (currYear - 3) >= entry.year ? 105 : 107 ]);
       c.set('internal.yearFilter', entry.year);
       c.set('calc.car_manufacturing_year', entry.year);
       c.model.form.moveForward();
