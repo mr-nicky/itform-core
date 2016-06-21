@@ -94,6 +94,7 @@ exports.itCarCost = function(c, $el) {
 
         $slider.slider({
           value: mm.current,
+          range: "min",
           min: mm.min,
           max: mm.max,
           step: 1000,
