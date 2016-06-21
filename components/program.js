@@ -185,6 +185,8 @@ exports.itAnswerPlace = function(c) {
     });
 
     storage.subscribe(0, length, function(programs) {
+      var hoverWasActivated;
+
       if ($img) {
         $img.remove();
         $img = null;
@@ -193,11 +195,24 @@ exports.itAnswerPlace = function(c) {
         cmp.elNode.$el.css('visibility', 'hidden');
       });
       var hover = showOnHover();
+
+      c.listen('external.progress', function(progress) {
+        var progressLength = progress.loaded / progress.max * 100;
+
+        if (progressLength >= 100 && !hoverWasActivated) {
+          programs.forEach(function(program, index) {
+            hover(c, places[index].elNode.$el, program);
+          });
+
+          hoverWasActivated = true;
+        }
+      });
+
       programs.forEach(function(program, index) {
         places[index].elNode.$el.css('visibility', '');
         placeLoadedData(c, places[index].elNode.$el, program);
-        hover(c, places[index].elNode.$el, program);
       });
+
     });
     c.set('internal.programTemplateStartAt', length);
   });
