@@ -96,10 +96,12 @@ function toRows(cells, columnNum) {
 }
 
 exports.itCarMark = function(c, $el) {
+
   c.appendToStep();
 
   c.set('calc', {});
   c.resolve(function(done) {
+
     var dict = c.loadDictionary('/rest/full/car_mark/');
 
     dict.subscribe(function(data) {

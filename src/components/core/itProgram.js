@@ -224,18 +224,21 @@ exports.itProgramProgress = function(c, $el) {
   $programMessagesElement.style.display = 'none';
 
   c.listen('external.progress', function(progress) {
-    var length = progress.loaded / progress.max * 100;
+    var progressLength = progress.loaded / progress.max * 100;
 
-    if (length < minWidth) {
-      length = minWidth;
+    progressLength = Math.floor(progressLength * 100);
+    progressLength = progressLength / 100;
+
+    if (progressLength < minWidth) {
+      progressLength = minWidth;
     }
 
-    $children.css('width', length + '%');
+    $children.css('width', progressLength + '%');
     $children.text(
-      length + '%'
+      progressLength + '%'
     );
 
-    if (length >= 100) {
+    if (progressLength >= 100) {
       $calculationIdElement.style.display = 'table';
       $programMessagesElement.style.display = 'block';
       $el.hide();

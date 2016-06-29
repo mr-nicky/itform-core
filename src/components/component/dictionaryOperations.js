@@ -44,9 +44,11 @@ Dictionary.prototype.request = function() {
 };
 
 function loadDictionary(c, url) {
+  
   if (dictionaryRegister[url]) {
     return dictionaryRegister[url];
   }
+  
   var dict = dictionaryRegister[url] = new Dictionary(url, c.getXhrFactory());
   dict.request();
   return dict;
