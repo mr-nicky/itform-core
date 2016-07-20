@@ -25,6 +25,10 @@ function LinearSteps(form) {
     self.moveToStep(self.currentStepIndex, self.currentStepIndex + 1);
   };
 
+  form.moveBackward = function() {
+    self.moveToStep(self.currentStepIndex, self.currentStepIndex - 1);
+  };
+
   form.moveToName = function(name) {
     var nextStepIndex = _.findIndex(form.model.steps, ['name', name]);
     if (nextStepIndex < 0) {

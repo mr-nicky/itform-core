@@ -20,8 +20,10 @@ exports.baseRegistry = function() {
   registry.register(require('./src/components/core/ItStep'));
   registry.register(require('./src/components/core/itCalculation'));
   registry.register(require('./src/components/core/itForward'));
+  registry.register(require('./src/components/core/itBackward'));
   registry.register(require('./src/components/core/itProgram'));
   registry.register(require('./src/components/core/itStepNav'));
+  registry.register(require('./src/front/script'));
   return registry;
 };
 
